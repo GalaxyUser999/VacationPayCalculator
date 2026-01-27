@@ -6,29 +6,35 @@ import org.springframework.stereotype.Service;
 import ru.bolotnaya.VacationPayCalculator.models.Holiday;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class CalculatorService {
-
     @NonNull
     private HolidayService holidayService;
-    private static final float AVERAGE_MONTHLY_CALENDAR_DAYS = 29.3F;
+    private static final BigDecimal AVERAGE_MONTHLY_CALENDAR_DAYS = new BigDecimal("29.3");
+    private static final BigDecimal MONTHS_IN_YEAR = new BigDecimal("12");
 
-    public String calculateVacationPay(BigDecimal yearlyAvgSalary, int vacationDays, LocalDate firstVacationDay) {
+
+    public String calculateVacationPay(BigDecimal yearlySalary, Integer vacationDays, LocalDate firstVacationDay) {
         int holidaysDuringVacation = findHolidaysDuringVacation(vacationDays, firstVacationDay);
         if (holidaysDuringVacation != 0) {
             vacationDays -= holidaysDuringVacation;
         }
-        BigDecimal vacationPay = yearlyAvgSalary
-                .divide(BigDecimal.valueOf(AVERAGE_MONTHLY_CALENDAR_DAYS), 3)
-                .multiply(BigDecimal.valueOf(vacationDays));
+
+        BigDecimal dailyAvgSalary = yearlySalary.divide(AVERAGE_MONTHLY_CALENDAR_DAYS.multiply(MONTHS_IN_YEAR),
+                10, RoundingMode.HALF_UP);
+        BigDecimal vacationPay = dailyAvgSalary.multiply(BigDecimal.valueOf(vacationDays));
+
+        vacationPay = vacationPay.setScale(2, RoundingMode.HALF_UP);
+
         return "Ваша сумма отпускных равна: " + vacationPay;
     }
 
-    private int findHolidaysDuringVacation(int vacationDays, LocalDate firstVacationDay) {
+    private int findHolidaysDuringVacation(Integer vacationDays, LocalDate firstVacationDay) {
         int holidaysDuringVacation = 0;
         List<Holiday> holidays = holidayService.getAllHolidays();
         for (int i = 0; i < vacationDays; i++) {
@@ -40,12 +46,5 @@ public class CalculatorService {
         return holidaysDuringVacation;
     }
 
-
-//    public BigDecimal calculateVacationPay(BigDecimal yearlyAvgSalary, int vacationDays){
-//        BigDecimal vacationPay = yearlyAvgSalary
-//                .divide(BigDecimal.valueOf(AVERAGE_MONTHLY_CALENDAR_DAYS), 3)
-//                .multiply(BigDecimal.valueOf(vacationDays));
-//        return vacationPay;
-//    }
 }
 
