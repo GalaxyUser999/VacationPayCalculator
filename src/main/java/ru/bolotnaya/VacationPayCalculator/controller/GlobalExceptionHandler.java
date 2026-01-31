@@ -1,4 +1,4 @@
-package ru.bolotnaya.VacationPayCalculator.controllers;
+package ru.bolotnaya.VacationPayCalculator.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

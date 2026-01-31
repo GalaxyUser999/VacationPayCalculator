@@ -1,8 +1,8 @@
-package ru.bolotnaya.VacationPayCalculator.controllers;
+package ru.bolotnaya.VacationPayCalculator.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,12 +12,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.bolotnaya.VacationPayCalculator.services.CalculatorService;
+import ru.bolotnaya.VacationPayCalculator.service.CalculatorService;
 
-import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.Pattern;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -25,7 +23,7 @@ import java.time.LocalDate;
 @RequestMapping("/calculate")
 @Tag(name = "Калькулятор отпускных", description = "Операции с калькулятором отпускных")
 @AllArgsConstructor
-@FieldDefaults(makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Validated
 public class CalculatorController {
     CalculatorService calculatorService;
@@ -39,7 +37,7 @@ public class CalculatorController {
                     "-Среднемесячное число календарных дней для расчёта отпускных: 29.3 (установлено ТК РФ)." +
                     "-Расчёт суммы с точностью до копейки (двух знаков после запятой) по правилам расчёта выплаты отпускных.")
     @GetMapping
-    public ResponseEntity<String> countVacationPay(@RequestParam(name = "yearlyAvgSalary")
+    public ResponseEntity<BigDecimal> countVacationPay(@RequestParam(name = "yearlyAvgSalary")
                                                    @DecimalMin(value = "1", message = "Число должно быть положительным и больше нуля")
                                                    BigDecimal yearlySalary,
                                                    @RequestParam(name = "vacationDays")
