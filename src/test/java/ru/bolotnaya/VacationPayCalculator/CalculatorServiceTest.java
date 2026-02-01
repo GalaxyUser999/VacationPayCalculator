@@ -38,12 +38,10 @@ public class CalculatorServiceTest {
         Method method;
         try {
             method = CalculatorService.class.getDeclaredMethod("fillInHolidaysList");
+            method.setAccessible(true);
+            method.invoke(calculatorService);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException(e);
-        }
-        method.setAccessible(true);
-        try {
-            method.invoke(calculatorService);
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (InvocationTargetException e) {
